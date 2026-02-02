@@ -24,9 +24,26 @@ dotenv.config({ path: join(__dirname, "../../.env") });
 import { getIngredientInfo } from "./data/ingredients.js";
 import { searchProducts } from "./data/products.js";
 import { getRoutine } from "./data/routines.js";
+import {
+  kbeautyTips,
+  trendingIngredients,
+  featuredRoutines,
+  getTipsByCategory,
+  getTipsBySkinConcern,
+  getTrendingIngredientsBySeason,
+  getFeaturedRoutineByName
+} from "./data/tips.js";
 
 // Auth imports
-import { getSupabaseClient, verifyToken, SkinLogInput } from "./auth/supabase.js";
+import { getSupabaseClient, verifyToken, SkinLogInput, SkinLog } from "./auth/supabase.js";
+
+// Services
+import {
+  analyzeSkinHistory,
+  getSeasonalContext,
+  generateRoutines,
+  DISCLAIMER as PERSONALIZED_DISCLAIMER
+} from "./services/skinAnalysis.js";
 
 // Constants
 const PORT = Number(process.env.PORT ?? 8787);
@@ -212,6 +229,63 @@ const TOOLS: Tool[] = [
       "openai/outputTemplate": OUTPUT_TEMPLATE,
       "openai/requiresAuth": true
     }
+  },
+  // Tool 6: generate_personalized_routine (OAuth required) - SPEC-PERSONALIZED-ROUTINE-001
+  {
+    name: "generate_personalized_routine",
+    description: "Use this when the user wants a personalized skincare routine based on their skin history. Analyzes past skin logs to recommend a customized K-beauty routine with seasonal adjustments. Requires sign-in.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        routine_type: {
+          type: "string",
+          enum: ["morning", "evening", "both"],
+          description: "Time of day for the routine (default: both)"
+        },
+        focus: {
+          type: "string",
+          enum: ["hydration", "oil_control", "anti_aging", "brightening", "acne"],
+          description: "Specific focus area for the routine"
+        },
+        include_products: {
+          type: "boolean",
+          description: "Whether to include product recommendations (default: true)"
+        }
+      }
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    _meta: {
+      "openai/outputTemplate": OUTPUT_TEMPLATE,
+      "openai/requiresAuth": true
+    }
+  },
+  // Tool 7: get_kbeauty_tips - SPEC-PERSONALIZED-ROUTINE-001
+  {
+    name: "get_kbeauty_tips",
+    description: "Use this when the user asks for K-beauty tips, skincare advice, trending ingredients, or wants to learn about Korean skincare techniques like glass skin routine or 7-skin method. Does not require sign-in.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        category: {
+          type: "string",
+          enum: ["morning", "evening", "weekly", "seasonal", "trending", "all"],
+          description: "Category of tips to retrieve (default: all)"
+        },
+        skin_concern: {
+          type: "string",
+          description: "Filter tips by skin concern like 'acne', 'dryness', 'aging'"
+        },
+        limit: {
+          type: "number",
+          description: "Maximum number of tips to return (default: 5)"
+        }
+      }
+    },
+    _meta: {
+      "openai/outputTemplate": OUTPUT_TEMPLATE
+    }
   }
 ];
 
@@ -379,6 +453,130 @@ async function handleToolCall(name: string, args: ToolArgs, userId?: string) {
         content: [{
           type: "text" as const,
           text: `Found ${data?.length ?? 0} skin log entries from the past ${days} days.`
+        }]
+      };
+    }
+
+    // SPEC-PERSONALIZED-ROUTINE-001: Personalized Routine Generator
+    case "generate_personalized_routine": {
+      if (!userId) {
+        return authRequiredResponse(`https://${process.env.PUBLIC_HOST ?? "localhost:8787"}`);
+      }
+
+      const supabase = getSupabaseClient();
+      const routineType = (args.routine_type as "morning" | "evening" | "both") ?? "both";
+      const focus = args.focus as string | undefined;
+      const includeProducts = (args.include_products as boolean) ?? true;
+
+      // Fetch user's skin history (last 14 days)
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 14);
+
+      const { data: skinLogs, error } = await supabase
+        .from("skin_logs")
+        .select("*")
+        .eq("user_id", userId)
+        .gte("logged_at", startDate.toISOString().split("T")[0])
+        .order("logged_at", { ascending: false });
+
+      if (error) {
+        return {
+          content: [{
+            type: "text" as const,
+            text: `Failed to fetch skin history: ${error.message}`
+          }],
+          isError: true
+        };
+      }
+
+      // Analyze skin history
+      const analysis = analyzeSkinHistory(skinLogs as SkinLog[] ?? []);
+      const seasonalContext = getSeasonalContext();
+      const personalizedRoutines = generateRoutines(analysis, seasonalContext, routineType, focus);
+
+      // Get product recommendations if requested
+      let productRecommendations: any[] = [];
+      if (includeProducts) {
+        const skinType = analysis.skin_type_assessment;
+        productRecommendations = searchProducts({
+          skin_type: skinType,
+          limit: 6
+        });
+      }
+
+      // Generate next steps based on analysis
+      const nextSteps: string[] = [];
+      if (!analysis.data_quality.is_sufficient) {
+        nextSteps.push("더 정확한 분석을 위해 매일 피부 상태를 기록해주세요");
+      }
+      if (analysis.recommended_focus.includes("hydration")) {
+        nextSteps.push("수분 집중 관리: 히알루론산 제품을 추가해보세요");
+      }
+      if (analysis.recommended_focus.includes("acne")) {
+        nextSteps.push("트러블 예방: 주 2-3회 BHA 각질 관리를 시도해보세요");
+      }
+      nextSteps.push("2주 후 루틴 효과를 확인하고 조정하세요");
+
+      return {
+        structuredContent: {
+          user_skin_analysis: analysis,
+          seasonal_context: seasonalContext,
+          personalized_routines: personalizedRoutines,
+          product_recommendations: productRecommendations,
+          next_steps: nextSteps,
+          disclaimer: PERSONALIZED_DISCLAIMER
+        },
+        content: [{
+          type: "text" as const,
+          text: `Based on your skin history, I've created a personalized ${routineType} routine for your ${analysis.skin_type_assessment} skin type. ${analysis.data_quality.message ?? ""}`
+        }]
+      };
+    }
+
+    // SPEC-PERSONALIZED-ROUTINE-001: K-Beauty Tips Content Hub
+    case "get_kbeauty_tips": {
+      const category = (args.category as string) ?? "all";
+      const skinConcern = args.skin_concern as string | undefined;
+      const limit = (args.limit as number) ?? 5;
+
+      // Get tips based on filters
+      let tips = skinConcern
+        ? getTipsBySkinConcern(skinConcern)
+        : getTipsByCategory(category);
+
+      // Apply limit
+      tips = tips.slice(0, limit);
+
+      // Get seasonal context for trending ingredients
+      const seasonalContext = getSeasonalContext();
+      const seasonalIngredients = getTrendingIngredientsBySeason(seasonalContext.current_season);
+
+      // Check if user is asking about specific routines
+      let featuredRoutine = undefined;
+      if (category === "trending" || category === "all") {
+        // Return a trending featured routine
+        featuredRoutine = featuredRoutines.find(r => r.is_trending);
+      }
+
+      // Check for specific routine mentions in skin_concern
+      if (skinConcern) {
+        const routineLookup = getFeaturedRoutineByName(skinConcern);
+        if (routineLookup) {
+          featuredRoutine = routineLookup;
+        }
+      }
+
+      return {
+        structuredContent: {
+          tips,
+          trending_ingredients: seasonalIngredients.slice(0, 5),
+          featured_routine: featuredRoutine,
+          category_filter: category,
+          total_tips_available: kbeautyTips.length
+        },
+        content: [{
+          type: "text" as const,
+          text: `Here are ${tips.length} K-beauty tips${category !== "all" ? ` for ${category}` : ""}${skinConcern ? ` related to ${skinConcern}` : ""}.`
         }]
       };
     }
