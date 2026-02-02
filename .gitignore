@@ -1,0 +1,150 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Build outputs
+server/dist/
+web/dist/widget.js
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+.uv-cache/
+*.pfx
+*.sqlite3
+*.temp
+.TemporaryItems
+.Trashes
+out/
+# Updated: 2026-01-10
+# Node.js (for docs/Nextra)
+.aws/config
+.moai-backups/
+api-key-*
+*-key.*
+dist/
+*.sw?
+.directory
+# Linux
+# Build Artifacts & Distribution
+# Logs & Temporary Files
+# Environment files
+.claude/skills/*/*/*secret*
+*.egg-info/
+# Backups
+*.dbm
+*.db
+*-backup/
+.claude/settings.local.json
+.fseventsd
+# Certificate files
+*-secret.*
+*.tsbuildinfo
+*.secret.*
+# IDE & Editors
+__pycache__/
+.uv_cache/
+.next/
+# ============================================
+# Purpose: Essential patterns for user projects
+[Dd]esktop.ini
+# Virtual Environments
+.claude/settings.local.*.json
+# ===========================================
+# FIXED: Issue #237 - Replaced overly broad *key* and *secret* patterns
+.Spotlight-V100
+*.backup
+!.env.example
+# Deployment & CI/CD
+.vercel/
+.claude/skills/*/*/*token*
+# Mac
+.netlify/
+# Build Tools & Frameworks
+# Secrets and Credentials (CRITICAL)
+*_secret=*
+.claude/local/
+# Credential patterns in environment files
+venv/
+.env/
+.VolumeIcon.icns
+.claude/skills/*/.env*
+.nuxt/
+.AppleDouble
+*.sqlite
+*.suo
+# Cloud provider credentials
+.cursor/
+*_token=*
+*_backup_*/
+.mypy_cache/
+*.key.*
+# Python Cache & Bytecode
+ehthumbs.db
+# OS Files
+*.sln
+# Windows
+.env.*
+coverage.json
+*.sublime-workspace
+*~
+build/
+env/
+.LSOverride
+htmlcov/
+logs/
+.firebase/
+.claude/.env.local*
+*.jks
+*.backup/
+# Private keys (specific patterns to avoid false positives)
+*.swo
+secret-key-*
+*.pyc
+secret-*.*
+.claude/plans/
+*.pyd
+.DocumentRevisions-V100
+*.njsproj
+.venv/
+# Test Coverage
+*.rdb
+*_secret.*
+dist-ssr/
+.#*
+*_key.*
+private-key*
+*.sublime-project
+*-api-key.*
+*.bak
+*.pem
+*.egg
+.aws/credentials
+.ruff_cache/
+.tscache/
+# Skill-specific credentials
+*.pyo
+*.swp
+.coverage
+*-secret-key.*
+# Claude Code Configuration
+.claude/skills/*/secrets/
+# Version: 0.33.0
+# MoAI-ADK Package Distribution .gitignore
+*.p12
+.turbo/
+.pytest_cache/
+*.tmp
+.claude/skills/*/*/*key*
