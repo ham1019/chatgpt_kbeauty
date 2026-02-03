@@ -22,8 +22,14 @@ dotenv.config({ path: join(__dirname, "../../.env") });
 
 // Data imports
 import { getIngredientInfo } from "./data/ingredients.js";
-import { searchProducts } from "./data/products.js";
+import { searchProducts as searchProductsStatic } from "./data/products.js";
 import { getRoutine } from "./data/routines.js";
+
+// Supabase product search (real-time)
+import {
+  searchProductsFromDB,
+  checkProductsTableExists
+} from "./services/productSearch.js";
 import {
   kbeautyTips,
   trendingIngredients,
@@ -348,14 +354,31 @@ async function handleToolCall(name: string, args: ToolArgs, userId?: string) {
     }
 
     case "search_products": {
-      const results = searchProducts(args as any);
+      // Try Supabase first, fallback to static data
+      let results;
+      let dataSource = "database";
+
+      try {
+        const hasProductsTable = await checkProductsTableExists();
+        if (hasProductsTable) {
+          results = await searchProductsFromDB(args as any);
+        } else {
+          results = searchProductsStatic(args as any);
+          dataSource = "static";
+        }
+      } catch (err) {
+        console.warn("Supabase product search failed, using static data:", err);
+        results = searchProductsStatic(args as any);
+        dataSource = "static";
+      }
 
       return {
         structuredContent: {
           query_summary: `${args.product_type ?? "All"} products${args.ingredients ? ` with ${(args.ingredients as string[]).join(", ")}` : ""}`,
           total_count: results.length,
           products: results,
-          filters_applied: args
+          filters_applied: args,
+          data_source: dataSource
         },
         content: [{
           type: "text" as const,
@@ -498,10 +521,25 @@ async function handleToolCall(name: string, args: ToolArgs, userId?: string) {
       let productRecommendations: any[] = [];
       if (includeProducts) {
         const skinType = analysis.skin_type_assessment;
-        productRecommendations = searchProducts({
-          skin_type: skinType,
-          limit: 6
-        });
+        try {
+          const hasProducts = await checkProductsTableExists();
+          if (hasProducts) {
+            productRecommendations = await searchProductsFromDB({
+              skin_type: skinType,
+              limit: 6
+            });
+          } else {
+            productRecommendations = searchProductsStatic({
+              skin_type: skinType,
+              limit: 6
+            });
+          }
+        } catch {
+          productRecommendations = searchProductsStatic({
+            skin_type: skinType,
+            limit: 6
+          });
+        }
       }
 
       // Generate next steps based on analysis

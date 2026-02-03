@@ -111,11 +111,11 @@ export function PersonalizedRoutine({
     <div className="personalized-routine">
       {/* Data Quality Warning */}
       {!userSkinAnalysis.data_quality.is_sufficient && userSkinAnalysis.data_quality.message && (
-        <div className="card" style={{ background: 'var(--accent-light)', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <span style={{ fontSize: '20px' }}>📊</span>
+        <div className="card" style={{ background: 'var(--accent-light)', marginBottom: '16px', padding: '20px' }}>
+          <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</div>
             <div>
-              <div style={{ fontWeight: 600, marginBottom: '4px' }}>데이터 수집 중</div>
+              <div style={{ fontWeight: 600, marginBottom: '4px' }}>Data Collection in Progress</div>
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                 {userSkinAnalysis.data_quality.message}
               </div>
@@ -125,22 +125,21 @@ export function PersonalizedRoutine({
       )}
 
       {/* Skin Analysis Summary Card */}
-      <div className="card">
-        <div className="card-header">
-          <div className="card-icon">📋</div>
+      <div className="card" style={{ padding: '20px', marginBottom: '16px' }}>
+        <div className="card-header" style={{ marginBottom: '16px' }}>
           <div>
-            <div className="card-title">피부 분석 결과</div>
+            <div className="card-title">Skin Analysis Results</div>
             <div className="card-subtitle">
-              {getSkinTypeLabel(userSkinAnalysis.skin_type_assessment)} 피부 · {userSkinAnalysis.data_quality.days_with_data}일 데이터 기반
+              {getSkinTypeLabel(userSkinAnalysis.skin_type_assessment)} skin type based on {userSkinAnalysis.data_quality.days_with_data} days of data
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px' }}>
           {/* Hydration */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <span style={{ fontSize: '13px' }}>💧 수분 레벨</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <span style={{ fontSize: '13px' }}>Hydration Level</span>
               <span style={{ fontSize: '13px', fontWeight: 600 }}>{userSkinAnalysis.average_hydration.toFixed(1)}/5</span>
             </div>
             <LevelBar value={userSkinAnalysis.average_hydration} color="#4fc3f7" />
@@ -148,8 +147,8 @@ export function PersonalizedRoutine({
 
           {/* Oiliness */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <span style={{ fontSize: '13px' }}>✨ 유분 레벨</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <span style={{ fontSize: '13px' }}>Oil Level</span>
               <span style={{ fontSize: '13px', fontWeight: 600 }}>{userSkinAnalysis.average_oiliness.toFixed(1)}/5</span>
             </div>
             <LevelBar value={userSkinAnalysis.average_oiliness} color="#ffb74d" />
@@ -157,8 +156,8 @@ export function PersonalizedRoutine({
 
           {/* Breakout Frequency */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <span style={{ fontSize: '13px' }}>🔴 트러블 빈도</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <span style={{ fontSize: '13px' }}>Breakout Frequency</span>
               <span style={{ fontSize: '13px', fontWeight: 600 }}>{Math.round(userSkinAnalysis.breakout_frequency * 100)}%</span>
             </div>
             <LevelBar value={userSkinAnalysis.breakout_frequency * 5} color="#ef5350" />
@@ -167,8 +166,8 @@ export function PersonalizedRoutine({
 
         {/* Identified Patterns */}
         {userSkinAnalysis.identified_patterns.length > 0 && (
-          <div style={{ marginTop: '12px' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>발견된 패턴</div>
+          <div style={{ marginTop: '16px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Identified Patterns</div>
             <div className="tag-list">
               {userSkinAnalysis.identified_patterns.map((pattern, i) => (
                 <span key={i} className="tag">{pattern}</span>
@@ -179,20 +178,18 @@ export function PersonalizedRoutine({
       </div>
 
       {/* Seasonal Banner */}
-      <div className="card" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--bg-card))' }}>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-          <span style={{ fontSize: '24px' }}>
-            {seasonalContext.current_season === 'spring' ? '🌸' :
-             seasonalContext.current_season === 'summer' ? '☀️' :
-             seasonalContext.current_season === 'fall' ? '🍂' : '❄️'}
-          </span>
+      <div className="card" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--bg-card))', padding: '20px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+          <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.5px', paddingTop: '2px' }}>
+            {getSeasonLabel(seasonalContext.current_season)}
+          </div>
           <div>
-            <div style={{ fontWeight: 600, marginBottom: '6px' }}>
-              {getSeasonLabel(seasonalContext.current_season)} 스킨케어 팁
+            <div style={{ fontWeight: 600, marginBottom: '8px' }}>
+              Seasonal Skincare Tips
             </div>
             <ul style={{ fontSize: '12px', color: 'var(--text-secondary)', paddingLeft: '16px', margin: 0 }}>
               {seasonalContext.season_specific_tips.slice(0, 2).map((tip, i) => (
-                <li key={i} style={{ marginBottom: '4px' }}>{tip}</li>
+                <li key={i} style={{ marginBottom: '6px' }}>{tip}</li>
               ))}
             </ul>
           </div>
@@ -201,14 +198,14 @@ export function PersonalizedRoutine({
 
       {/* Routine Tabs */}
       {(morningRoutine || eveningRoutine) && (
-        <div className="card">
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+        <div className="card" style={{ padding: '20px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
             {morningRoutine && (
               <button
                 onClick={() => setActiveTab('morning')}
                 style={{
                   flex: 1,
-                  padding: '10px',
+                  padding: '12px',
                   border: 'none',
                   borderRadius: '8px',
                   background: activeTab === 'morning' ? 'var(--accent)' : 'var(--bg-secondary)',
@@ -218,7 +215,7 @@ export function PersonalizedRoutine({
                   transition: 'all 0.2s'
                 }}
               >
-                🌅 아침 루틴
+                AM Routine
               </button>
             )}
             {eveningRoutine && (
@@ -226,7 +223,7 @@ export function PersonalizedRoutine({
                 onClick={() => setActiveTab('evening')}
                 style={{
                   flex: 1,
-                  padding: '10px',
+                  padding: '12px',
                   border: 'none',
                   borderRadius: '8px',
                   background: activeTab === 'evening' ? 'var(--accent)' : 'var(--bg-secondary)',
@@ -236,15 +233,15 @@ export function PersonalizedRoutine({
                   transition: 'all 0.2s'
                 }}
               >
-                🌙 저녁 루틴
+                PM Routine
               </button>
             )}
           </div>
 
           {activeRoutine && (
             <>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-                예상 소요 시간: {activeRoutine.estimated_time}
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                Estimated time: {activeRoutine.estimated_time}
               </div>
               <ul className="routine-steps">
                 {activeRoutine.steps.map((step, index) => (
@@ -265,7 +262,7 @@ export function PersonalizedRoutine({
                       </div>
                       <div className="step-description">{step.description}</div>
                       {step.tip && (
-                        <div className="step-tip">💡 {step.tip}</div>
+                        <div className="step-tip">Tip: {step.tip}</div>
                       )}
                     </div>
                   </li>
@@ -278,20 +275,16 @@ export function PersonalizedRoutine({
 
       {/* Product Recommendations */}
       {productRecommendations.length > 0 && (
-        <div className="card">
-          <div className="card-header">
-            <div className="card-icon">🧴</div>
+        <div className="card" style={{ padding: '20px', marginBottom: '16px' }}>
+          <div className="card-header" style={{ marginBottom: '16px' }}>
             <div>
-              <div className="card-title">추천 제품</div>
-              <div className="card-subtitle">{productRecommendations.length}개 제품</div>
+              <div className="card-title">Recommended Products</div>
+              <div className="card-subtitle">{productRecommendations.length} products</div>
             </div>
           </div>
-          <div className="product-grid" style={{ marginTop: '12px' }}>
+          <div className="product-grid" style={{ marginTop: '16px', gap: '16px' }}>
             {productRecommendations.slice(0, 6).map((product, index) => (
-              <div key={index} className="product-card">
-                <div className="product-image">
-                  <span style={{ fontSize: '32px' }}>🧴</span>
-                </div>
+              <div key={index} className="product-card" style={{ padding: '16px' }}>
                 <div className="product-info">
                   <div className="product-brand">{product.brand}</div>
                   <div className="product-name">{product.name}</div>
@@ -305,21 +298,20 @@ export function PersonalizedRoutine({
 
       {/* Next Steps */}
       {nextSteps.length > 0 && (
-        <div className="card">
-          <div className="card-header">
-            <div className="card-icon">🎯</div>
-            <div className="card-title">다음 단계</div>
+        <div className="card" style={{ padding: '20px', marginBottom: '16px' }}>
+          <div className="card-header" style={{ marginBottom: '16px' }}>
+            <div className="card-title">Next Steps</div>
           </div>
-          <ul style={{ fontSize: '13px', paddingLeft: '20px', margin: '12px 0 0 0' }}>
+          <ul style={{ fontSize: '13px', paddingLeft: '20px', margin: '16px 0 0 0' }}>
             {nextSteps.map((step, i) => (
-              <li key={i} style={{ marginBottom: '8px', color: 'var(--text-secondary)' }}>{step}</li>
+              <li key={i} style={{ marginBottom: '10px', color: 'var(--text-secondary)' }}>{step}</li>
             ))}
           </ul>
         </div>
       )}
 
       {/* Disclaimer */}
-      <div className="disclaimer">⚠️ {disclaimer}</div>
+      <div className="disclaimer" style={{ marginTop: '24px' }}>{disclaimer}</div>
     </div>
   );
 }

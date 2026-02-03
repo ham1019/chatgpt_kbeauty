@@ -11,7 +11,6 @@ export function RoutineGuide({ skinType, routines, disclaimer }: RoutineGuidePro
   if (routines.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state-icon">🔍</div>
         <p>No routine found for this skin type.</p>
       </div>
     );
@@ -20,10 +19,10 @@ export function RoutineGuide({ skinType, routines, disclaimer }: RoutineGuidePro
   return (
     <div className="routine-guide">
       {routines.map((routine, index) => (
-        <div key={index} className="card">
-          <div className="card-header">
-            <div className="card-icon">
-              {routine.routine_type === 'morning' ? '🌅' : '🌙'}
+        <div key={index} className="card" style={{ padding: '20px', marginBottom: '16px' }}>
+          <div className="card-header" style={{ marginBottom: '16px' }}>
+            <div className="card-icon" style={{ fontSize: '14px', fontWeight: 600 }}>
+              {routine.routine_type === 'morning' ? 'AM' : 'PM'}
             </div>
             <div>
               <div className="card-title">
@@ -40,7 +39,7 @@ export function RoutineGuide({ skinType, routines, disclaimer }: RoutineGuidePro
                   <div className="step-name">{step.step_name}</div>
                   <div className="step-description">{step.description}</div>
                   {step.tips && (
-                    <div className="step-tip">💡 {step.tips}</div>
+                    <div className="step-tip">Tip: {step.tips}</div>
                   )}
                 </div>
               </li>
@@ -48,7 +47,7 @@ export function RoutineGuide({ skinType, routines, disclaimer }: RoutineGuidePro
           </ul>
         </div>
       ))}
-      {disclaimer && <div className="disclaimer">ℹ️ {disclaimer}</div>}
+      {disclaimer && <div className="disclaimer">{disclaimer}</div>}
     </div>
   );
 }

@@ -17,7 +17,6 @@ export function ProductSearch({ products, totalCount, querySummary }: ProductSea
   if (products.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state-icon">🛍️</div>
         <p>No products found matching your criteria.</p>
       </div>
     );
@@ -25,17 +24,16 @@ export function ProductSearch({ products, totalCount, querySummary }: ProductSea
 
   return (
     <div className="product-search">
-      <div className="header">
-        <div className="header-icon">🛍️</div>
+      <div className="header" style={{ marginBottom: '24px' }}>
         <div>
           <div className="header-title">Product Explorer</div>
           <div className="header-subtitle">{totalCount} products found</div>
         </div>
       </div>
 
-      <div className="product-grid">
+      <div className="product-grid" style={{ gap: '16px' }}>
         {products.map((product) => (
-          <div key={product.id} className="product-card">
+          <div key={product.id} className="product-card" style={{ padding: '16px' }}>
             <div className="product-brand">{product.brand}</div>
             <div className="product-name">{product.name}</div>
             <div className="product-meta">

@@ -53,16 +53,16 @@ function getCategoryLabel(category: string): string {
   return labels[category] || category;
 }
 
-// Helper to get category icon
-function getCategoryIcon(category: string): string {
-  const icons: Record<string, string> = {
-    morning: '🌅',
-    evening: '🌙',
-    weekly: '📅',
-    seasonal: '🌸',
-    trending: '🔥'
+// Helper to get category label abbreviation
+function getCategoryAbbr(category: string): string {
+  const abbrs: Record<string, string> = {
+    morning: 'AM',
+    evening: 'PM',
+    weekly: 'WK',
+    seasonal: 'SN',
+    trending: 'TR'
   };
-  return icons[category] || '💡';
+  return abbrs[category] || '';
 }
 
 // Helper to get difficulty badge color
@@ -106,10 +106,12 @@ export function KBeautyTipsHub({
       {featuredRoutine && (
         <div className="card" style={{
           background: 'linear-gradient(135deg, var(--accent-light), var(--bg-card))',
-          borderLeft: '4px solid var(--accent)'
+          borderLeft: '4px solid var(--accent)',
+          padding: '24px',
+          marginBottom: '16px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-            <span style={{ fontSize: '32px' }}>✨</span>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.5px', paddingTop: '4px' }}>Featured</div>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                 <span style={{ fontWeight: 600, fontSize: '15px' }}>{featuredRoutine.name}</span>
@@ -155,17 +157,17 @@ export function KBeautyTipsHub({
       {/* Category Filter Tabs */}
       <div style={{
         display: 'flex',
-        gap: '6px',
+        gap: '8px',
         overflowX: 'auto',
-        padding: '4px 0',
-        marginBottom: '12px'
+        padding: '6px 0',
+        marginBottom: '16px'
       }}>
         {categories.map(cat => (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
             style={{
-              padding: '6px 12px',
+              padding: '8px 14px',
               border: 'none',
               borderRadius: '16px',
               background: activeCategory === cat ? 'var(--accent)' : 'var(--bg-secondary)',
@@ -177,27 +179,26 @@ export function KBeautyTipsHub({
               transition: 'all 0.2s'
             }}
           >
-            {cat !== 'all' && getCategoryIcon(cat)} {getCategoryLabel(cat)}
+            {getCategoryLabel(cat)}
           </button>
         ))}
       </div>
 
       {/* Tips Cards */}
-      <div className="card">
-        <div className="card-header">
-          <div className="card-icon">💡</div>
+      <div className="card" style={{ padding: '20px', marginBottom: '16px' }}>
+        <div className="card-header" style={{ marginBottom: '16px' }}>
           <div>
-            <div className="card-title">K-Beauty 팁</div>
-            <div className="card-subtitle">{filteredTips.length}개 팁</div>
+            <div className="card-title">K-Beauty Tips</div>
+            <div className="card-subtitle">{filteredTips.length} tips</div>
           </div>
         </div>
 
         {filteredTips.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-secondary)' }}>
-            해당 카테고리에 팁이 없습니다.
+          <div style={{ textAlign: 'center', padding: '24px', color: 'var(--text-secondary)' }}>
+            No tips available in this category.
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
             {filteredTips.map(tip => {
               const isExpanded = expandedTip === tip.id;
               const diffStyle = getDifficultyStyle(tip.difficulty);
@@ -206,13 +207,13 @@ export function KBeautyTipsHub({
                 <div
                   key={tip.id}
                   className="ingredient-card"
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'pointer', padding: '18px' }}
                   onClick={() => setExpandedTip(isExpanded ? null : tip.id)}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <span>{getCategoryIcon(tip.category)}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{getCategoryAbbr(tip.category)}</span>
                         <span style={{ fontWeight: 600, fontSize: '14px' }}>{tip.title}</span>
                       </div>
                       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -241,19 +242,19 @@ export function KBeautyTipsHub({
                   </div>
 
                   {isExpanded && (
-                    <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                    <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
                       <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                         {tip.content}
                       </div>
                       {tip.source && (
-                        <div style={{ fontSize: '11px', color: 'var(--accent)', marginTop: '10px' }}>
-                          📚 {tip.source}
+                        <div style={{ fontSize: '11px', color: 'var(--accent)', marginTop: '12px' }}>
+                          Source: {tip.source}
                         </div>
                       )}
                       {tip.related_ingredients && tip.related_ingredients.length > 0 && (
-                        <div style={{ marginTop: '10px' }}>
-                          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                            관련 성분:
+                        <div style={{ marginTop: '14px' }}>
+                          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                            Related Ingredients:
                           </div>
                           <div className="tag-list">
                             {tip.related_ingredients.map((ing, i) => (
@@ -263,9 +264,9 @@ export function KBeautyTipsHub({
                         </div>
                       )}
                       {tip.skin_concerns && tip.skin_concerns.length > 0 && (
-                        <div style={{ marginTop: '8px' }}>
-                          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                            피부 고민:
+                        <div style={{ marginTop: '12px' }}>
+                          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                            Skin Concerns:
                           </div>
                           <div className="tag-list">
                             {tip.skin_concerns.map((concern, i) => (
@@ -285,18 +286,17 @@ export function KBeautyTipsHub({
 
       {/* Trending Ingredients Section */}
       {trendingIngredients.length > 0 && (
-        <div className="card">
-          <div className="card-header">
-            <div className="card-icon">🔥</div>
+        <div className="card" style={{ padding: '20px', marginBottom: '16px' }}>
+          <div className="card-header" style={{ marginBottom: '16px' }}>
             <div>
-              <div className="card-title">트렌딩 성분</div>
-              <div className="card-subtitle">지금 주목받는 K-Beauty 성분</div>
+              <div className="card-title">Trending Ingredients</div>
+              <div className="card-subtitle">Popular K-Beauty ingredients right now</div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
             {trendingIngredients.map(ingredient => (
-              <div key={ingredient.id} className="ingredient-card">
+              <div key={ingredient.id} className="ingredient-card" style={{ padding: '18px' }}>
                 <div className="ingredient-name">
                   {ingredient.name}
                   {ingredient.korean_name && (
@@ -304,14 +304,14 @@ export function KBeautyTipsHub({
                   )}
                 </div>
                 <div className="ingredient-section">
-                  <div className="ingredient-section-title">왜 트렌딩인가요?</div>
+                  <div className="ingredient-section-title">Why Trending</div>
                   <div className="ingredient-description">{ingredient.why_trending}</div>
                 </div>
                 <div className="ingredient-section">
-                  <div className="ingredient-section-title">사용법</div>
+                  <div className="ingredient-section-title">How to Use</div>
                   <div className="ingredient-description">{ingredient.how_to_use}</div>
                 </div>
-                <div className="tag-list" style={{ marginTop: '8px' }}>
+                <div className="tag-list" style={{ marginTop: '12px' }}>
                   {ingredient.best_for.slice(0, 3).map((tag, i) => (
                     <span key={i} className="tag good">{tag}</span>
                   ))}
@@ -326,11 +326,11 @@ export function KBeautyTipsHub({
       {totalTipsAvailable && totalTipsAvailable > tips.length && (
         <div style={{
           textAlign: 'center',
-          padding: '12px',
+          padding: '16px',
           fontSize: '12px',
           color: 'var(--text-secondary)'
         }}>
-          총 {totalTipsAvailable}개의 팁 중 {tips.length}개를 표시 중
+          Showing {tips.length} of {totalTipsAvailable} tips
         </div>
       )}
     </div>

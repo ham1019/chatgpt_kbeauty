@@ -10,7 +10,6 @@ export function IngredientInfo({ ingredients, disclaimer }: IngredientInfoProps)
   if (ingredients.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state-icon">🔬</div>
         <p>No ingredient information found.</p>
       </div>
     );
@@ -18,8 +17,7 @@ export function IngredientInfo({ ingredients, disclaimer }: IngredientInfoProps)
 
   return (
     <div className="ingredient-info">
-      <div className="header">
-        <div className="header-icon">🔬</div>
+      <div className="header" style={{ marginBottom: '24px' }}>
         <div>
           <div className="header-title">Ingredient Guide</div>
           <div className="header-subtitle">
@@ -29,7 +27,7 @@ export function IngredientInfo({ ingredients, disclaimer }: IngredientInfoProps)
       </div>
 
       {ingredients.map((ingredient, index) => (
-        <div key={index} className="ingredient-card">
+        <div key={index} className="ingredient-card" style={{ padding: '18px', marginBottom: '14px' }}>
           <div className="ingredient-name">
             {ingredient.name}
             <span className="ingredient-category">
@@ -75,13 +73,13 @@ export function IngredientInfo({ ingredients, disclaimer }: IngredientInfoProps)
 
           {ingredient.fun_fact && (
             <div className="ingredient-fun-fact">
-              <span>✨ {ingredient.fun_fact}</span>
+              <span>{ingredient.fun_fact}</span>
             </div>
           )}
         </div>
       ))}
 
-      {disclaimer && <div className="disclaimer">ℹ️ {disclaimer}</div>}
+      {disclaimer && <div className="disclaimer">{disclaimer}</div>}
     </div>
   );
 }

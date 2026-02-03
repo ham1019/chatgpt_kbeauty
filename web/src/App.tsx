@@ -80,9 +80,8 @@ export function App() {
 
   // Default empty state
   return (
-    <div className="empty-state">
-      <div className="empty-state-icon">🧴</div>
-      <p>Ask me about skincare routines, ingredients, or products!</p>
+    <div className="empty-state" style={{ padding: '48px 24px' }}>
+      <p>Ask me about skincare routines, ingredients, or products.</p>
     </div>
   );
 }
